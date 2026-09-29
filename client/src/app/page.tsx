@@ -13,19 +13,21 @@ const perks = [
 export default function Home() {
   return (
     <>
-      <section className="relative overflow-hidden border-b border-border">
+      {/* Fills the first screen below the sticky header (h-16 + 1px border);
+          svh keeps mobile browser toolbars from pushing content off-screen. */}
+      <section className="relative flex min-h-[calc(100svh-4rem-1px)] items-center overflow-hidden border-b border-border">
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-40 left-1/2 h-[480px] w-[900px] -translate-x-1/2 rounded-full bg-accent/20 blur-3xl"
+          className="pointer-events-none absolute -top-40 left-1/2 h-[480px] w-[900px] max-w-[160vw] -translate-x-1/2 rounded-full bg-accent/20 blur-3xl"
         />
-        <div className="container-page relative flex flex-col items-center py-24 text-center sm:py-32">
+        <div className="container-page relative flex flex-col items-center py-16 text-center">
           <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted">
             New season · Up to 20% off selected gear
           </span>
-          <h1 className="mt-6 max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">
+          <h1 className="mt-6 max-w-4xl text-4xl font-semibold tracking-tight sm:text-6xl lg:text-7xl">
             Technology, <span className="text-accent">refined.</span>
           </h1>
-          <p className="mt-5 max-w-xl text-lg text-muted">
+          <p className="mt-5 max-w-xl text-lg text-muted sm:text-xl">
             Laptops, audio and desk gear chosen for design, performance and longevity. Everything you
             need for a better setup.
           </p>
