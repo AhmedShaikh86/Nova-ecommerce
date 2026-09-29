@@ -12,23 +12,40 @@ export async function seedAll({ reset = false } = {}) {
     await Promise.all([Order.deleteMany({}), Product.deleteMany({}), User.deleteMany({})]);
   }
 
-  await Product.insertMany(seedProducts.map((p) => ({ ...p, slug: slugify(p.name) })));
+  // Unique indexes must exist before inserting: several serverless instances can
+  // cold-start on an empty database at once, and the indexes turn their parallel
+  // seeds into duplicate-key errors instead of duplicate documents.
+  await Promise.all([Product.createIndexes(), User.createIndexes()]);
 
-  if (!(await User.exists({ email: env.adminEmail }))) {
-    await User.create({
+  await ignoreDuplicates(
+    Product.insertMany(
+      seedProducts.map((p) => ({ ...p, slug: slugify(p.name) })),
+      { ordered: false },
+    ),
+  );
+  await ignoreDuplicates(
+    User.create({
       name: "NOVA Admin",
       email: env.adminEmail,
       password: env.adminPassword,
       role: "admin",
-    });
-  }
-  if (!(await User.exists({ email: DEMO_CUSTOMER.email }))) {
-    await User.create({ name: "Demo Customer", ...DEMO_CUSTOMER });
-  }
+    }),
+  );
+  await ignoreDuplicates(User.create({ name: "Demo Customer", ...DEMO_CUSTOMER }));
 
   console.log(`🌱 Seeded ${seedProducts.length} products`);
-  console.log(`   Admin:    ${env.adminEmail} / ${env.adminPassword}`);
-  console.log(`   Customer: ${DEMO_CUSTOMER.email} / ${DEMO_CUSTOMER.password}`);
+  if (!env.isProd) {
+    console.log(`   Admin:    ${env.adminEmail} / ${env.adminPassword}`);
+    console.log(`   Customer: ${DEMO_CUSTOMER.email} / ${DEMO_CUSTOMER.password}`);
+  }
+}
+
+async function ignoreDuplicates(work: Promise<unknown>) {
+  try {
+    await work;
+  } catch (err) {
+    if ((err as { code?: number }).code !== 11000) throw err;
+  }
 }
 
 export async function seedIfEmpty() {
