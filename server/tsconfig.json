@@ -3,7 +3,7 @@
     "target": "ES2022",
     "module": "commonjs",
     "moduleResolution": "node",
-    "rootDir": "src",
+    "rootDir": ".",
     "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
@@ -12,5 +12,8 @@
     "resolveJsonModule": true,
     "sourceMap": true
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "api"
+  ]
 }
